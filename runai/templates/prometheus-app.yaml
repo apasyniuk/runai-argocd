@@ -1,0 +1,39 @@
+{{- define "runai.prometheus.defaults" -}}
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+installCRDs: true
+{{- end }}
+
+{{- if .Values.prometheus.enabled }}
+{{- $defaults := fromYaml (include "runai.prometheus.defaults" .) }}
+{{- $values := merge (.Values.prometheus.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-prometheus
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: {{ .Values.prometheus.version | quote }}
+    helm:
+      releaseName: kube-prometheus-stack
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.prometheus.namespace }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}

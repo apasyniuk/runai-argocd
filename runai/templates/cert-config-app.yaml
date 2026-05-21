@@ -1,0 +1,41 @@
+{{- define "runai.certConfig.defaults" -}}
+domain: {{ required "domain is required" .Values.domain | quote }}
+caBundleName: {{ .Values.caBundleName | quote }}
+certManager:
+  namespace: {{ .Values.certManager.namespace | quote }}
+runai:
+  namespace: {{ .Values.runai.namespace | quote }}
+{{- end }}
+
+{{- if .Values.selfSignedCA }}
+{{- $defaults := fromYaml (include "runai.certConfig.defaults" .) }}
+{{- $values := merge (.Values.certConfig.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-cert-config
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: {{ required "chartRepo.url is required when selfSignedCA is true" .Values.chartRepo.url | quote }}
+    chart: cert-config
+    targetRevision: {{ .Values.chartRepo.revision | quote }}
+    helm:
+      releaseName: cert-config
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server | quote }}
+    namespace: {{ .Values.certManager.namespace | quote }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}

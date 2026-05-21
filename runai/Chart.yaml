@@ -1,0 +1,6 @@
+apiVersion: v2
+name: runai
+description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx, Prometheus, and the Run:ai control plane in dependency order
+type: application
+version: 0.1.0
+appVersion: "2.25.9"

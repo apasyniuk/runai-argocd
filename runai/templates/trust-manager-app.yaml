@@ -1,0 +1,43 @@
+{{- define "runai.trustManager.defaults" -}}
+secretTargets:
+  enabled: true
+  authorizedSecretsAll: true
+crds:
+  enabled: true
+app:
+  trust:
+    namespace: {{ .Values.certManager.namespace }}
+{{- end }}
+
+{{- if and .Values.selfSignedCA .Values.certManager.enabled }}
+{{- $defaults := fromYaml (include "runai.trustManager.defaults" .) }}
+{{- $values := merge (.Values.trustManager.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-trust-manager
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: trust-manager
+    targetRevision: {{ .Values.trustManager.version | quote }}
+    helm:
+      releaseName: trust-manager
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.certManager.namespace }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}

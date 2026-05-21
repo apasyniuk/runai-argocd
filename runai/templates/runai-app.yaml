@@ -1,0 +1,54 @@
+{{- define "runai.controlPlane.defaults" -}}
+global:
+  customCA:
+    {{- if .Values.selfSignedCA }}
+    enabled: true
+    secret:
+      name: {{ .Values.caBundleName }}
+    {{- else if .Values.customCAName }}
+    enabled: true
+    secret:
+      name: {{ .Values.customCAName }}
+    {{- else }}
+    enabled: false
+    {{- end }}
+  domain: {{ required "domain is required" .Values.domain | quote }}
+  imagePullSecrets:
+    - name: {{ .Values.imagePullSecret | quote }}
+tenantsManager:
+  config:
+    adminUsername: {{ .Values.adminUsername | quote }}
+    adminPassword: {{ .Values.adminPassword | quote }}
+{{- end }}
+
+{{- $defaults := fromYaml (include "runai.controlPlane.defaults" .) }}
+{{- $values := merge (.Values.runai.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-control-plane
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: https://runai.jfrog.io/artifactory/cp-charts-prod
+    chart: control-plane
+    targetRevision: {{ .Values.runai.version | quote }}
+    helm:
+      releaseName: runai-backend
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.runai.namespace }}
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

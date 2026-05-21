@@ -1,0 +1,8 @@
+domain: ""
+caBundleName: runai-ca-bundle
+
+certManager:
+  namespace: cert-manager
+
+runai:
+  namespace: runai

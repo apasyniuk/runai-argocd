@@ -1,0 +1,58 @@
+argocd:
+  namespace: argocd
+
+project: default
+
+# URL of the workload cluster as registered in ArgoCD.
+# Use https://kubernetes.default.svc when ArgoCD and workloads share the same cluster.
+destination:
+  server: https://kubernetes.default.svc
+
+# Run:ai credentials and domain
+domain: ""
+adminUsername: "admin@run.ai"
+adminPassword: ""
+imagePullSecret: "runai-reg-creds"
+
+# customCAName: existing Secret name with key runai-ca.pem to trust as CA.
+# selfSignedCA: builds a full intermediate CA chain via cert-manager + trust-manager.
+#   Requires chartRepo.url so ArgoCD can pull the cert-config child chart.
+customCAName: ""
+selfSignedCA: false
+
+# Helm registry hosting this chart collection. Required when selfSignedCA is true.
+chartRepo:
+  url: ""
+  revision: "0.1.0"
+
+caBundleName: runai-ca-bundle
+
+certManager:
+  enabled: true
+  namespace: cert-manager
+  version: v1.16.2
+  valuesOverride: {}
+
+trustManager:
+  version: v0.12.0
+  valuesOverride: {}
+
+ingressNginx:
+  enabled: true
+  namespace: ingress-nginx
+  version: 4.11.0
+  valuesOverride: {}
+
+prometheus:
+  enabled: true
+  namespace: monitoring
+  version: 65.1.1
+  valuesOverride: {}
+
+certConfig:
+  valuesOverride: {}
+
+runai:
+  namespace: runai
+  version: 2.25.9
+  valuesOverride: {}

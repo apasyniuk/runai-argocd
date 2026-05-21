@@ -1,0 +1,37 @@
+{{- define "runai.ingressNginx.defaults" -}}
+controller:
+  service:
+    type: LoadBalancer
+{{- end }}
+
+{{- if .Values.ingressNginx.enabled }}
+{{- $defaults := fromYaml (include "runai.ingressNginx.defaults" .) }}
+{{- $values := merge (.Values.ingressNginx.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-ingress-nginx
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: https://kubernetes.github.io/ingress-nginx
+    chart: ingress-nginx
+    targetRevision: {{ .Values.ingressNginx.version | quote }}
+    helm:
+      releaseName: ingress-nginx
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.ingressNginx.namespace }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}

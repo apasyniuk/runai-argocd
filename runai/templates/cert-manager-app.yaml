@@ -1,0 +1,37 @@
+{{- define "runai.certManager.defaults" -}}
+crds:
+  enabled: true
+{{- end }}
+
+{{- if .Values.certManager.enabled }}
+{{- $defaults := fromYaml (include "runai.certManager.defaults" .) }}
+{{- $values := merge (.Values.certManager.valuesOverride | default dict) $defaults }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-cert-manager
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: {{ .Values.certManager.version | quote }}
+    helm:
+      releaseName: cert-manager
+      values: |
+        {{- toYaml $values | nindent 8 }}
+  destination:
+    server: {{ .Values.destination.server }}
+    namespace: {{ .Values.certManager.namespace }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}
