@@ -24,7 +24,7 @@ spec:
   source:
     repoURL: {{ required "chartRepo.url is required when selfSignedCA is true" .Values.chartRepo.url | quote }}
     chart: cert-config
-    targetRevision: {{ .Values.chartRepo.revision | quote }}
+    targetRevision: {{ .Values.chartRepo.certConfigRevision | quote }}
     helm:
       releaseName: cert-config
       values: |

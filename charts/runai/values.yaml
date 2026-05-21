@@ -23,7 +23,7 @@ selfSignedCA: false
 # Helm registry hosting this chart collection. Required when selfSignedCA is true.
 chartRepo:
   url: ""
-  revision: "0.1.0"
+  certConfigRevision: "0.1.0"
 
 caBundleName: runai-ca-bundle
 
