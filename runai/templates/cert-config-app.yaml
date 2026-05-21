@@ -30,7 +30,7 @@ spec:
       values: |
         {{- toYaml $values | nindent 8 }}
   destination:
-    server: {{ .Values.destination.server | quote }}
+    name: {{ .Values.destination.name | quote }}
     namespace: {{ .Values.certManager.namespace | quote }}
   syncPolicy:
     automated:

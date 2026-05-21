@@ -43,7 +43,7 @@ spec:
       values: |
         {{- toYaml $values | nindent 8 }}
   destination:
-    server: {{ .Values.destination.server }}
+    name: {{ .Values.destination.name }}
     namespace: {{ .Values.runai.namespace }}
   syncPolicy:
     automated:

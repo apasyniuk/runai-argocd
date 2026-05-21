@@ -6,7 +6,7 @@ project: default
 # URL of the workload cluster as registered in ArgoCD.
 # Use https://kubernetes.default.svc when ArgoCD and workloads share the same cluster.
 destination:
-  server: https://kubernetes.default.svc
+  name: in-cluster
 
 # Run:ai credentials and domain
 domain: ""
