@@ -32,7 +32,7 @@ spec:
         gpu-operator:
           enabled: false
   destination:
-    name: in-cluster
+    name: {{ .Values.destination.name | quote }}
     namespace: runai
   syncPolicy:
     automated:
