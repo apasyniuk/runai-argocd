@@ -90,7 +90,7 @@ spec:
           kubectl create secret generic runai-cluster-credentials \
             --namespace="${CREDENTIALS_NAMESPACE}" \
             --from-literal=clusterUID="${CLUSTER_UUID}" \
-            --from-literal=clientSecret="${CLIENT_SECRET}" \
+            --from-literal=client-secret="${CLIENT_SECRET}" \
             --dry-run=client -o yaml | kubectl apply -f -
 
           echo "Done. Credentials written to secret runai-cluster-credentials in ${CREDENTIALS_NAMESPACE}."

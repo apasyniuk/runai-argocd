@@ -4,7 +4,7 @@ adminPassword: ""
 clusterName: ""
 clusterURL: ""
 agentVersion: ""
-credentialsNamespace: "argocd"
+credentialsNamespace: "runai"
 image: "alpine/k8s:1.31.4"
 
 # CA certificate for TLS verification.

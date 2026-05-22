@@ -23,7 +23,7 @@ spec:
         clusterName: {{ .Values.agentCluster.name | default .Values.destination.name | quote }}
         clusterURL: "https://{{ .Values.domain }}"
         agentVersion: {{ .Values.runai.version | quote }}
-        credentialsNamespace: {{ .Values.argocd.namespace | quote }}
+        credentialsNamespace: {{ .Values.runai.namespace | quote }}
         {{- if .Values.customCAName }}
         caSecretName: {{ .Values.customCAName | quote }}
         caKey: "runai-ca.pem"
