@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   cert-config:
   - apiVersion: v2
+    created: "2026-05-22T08:08:55.545806666Z"
+    description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
+      TLS — deployed to the workload cluster
+    digest: b48f7e71c065eb9fa80902840688ed4a56659801a5bb3e67125bc25dc4ada822
+    name: cert-config
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-0.5.0/cert-config-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     created: "2026-05-22T07:44:01.531914035Z"
     description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
       TLS — deployed to the workload cluster
@@ -12,6 +22,16 @@ entries:
     - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-0.4.0/cert-config-0.4.0.tgz
     version: 0.4.0
   runai:
+  - apiVersion: v2
+    created: "2026-05-22T08:08:55.795121946Z"
+    description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
+      Prometheus, and the Run:ai control plane in dependency order
+    digest: 4077b23775930987e897ca1f0a0dc606c2854c7ac9fb6476a2dcbde04bbbb094
+    name: runai
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.5.0/runai-0.5.0.tgz
+    version: 0.5.0
   - apiVersion: v2
     created: "2026-05-22T07:44:01.707687287Z"
     description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
@@ -54,4 +74,4 @@ entries:
     urls:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.1.0/runai-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T07:44:01.70770261Z"
+generated: "2026-05-22T08:08:55.795150811Z"
