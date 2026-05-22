@@ -20,6 +20,10 @@ imagePullSecret: "runai-reg-creds"
 customCAName: ""
 selfSignedCA: false
 
+# registryToken: Run:ai JFrog registry pull token.
+# When set, creates the runai-reg-creds docker-registry Secret automatically.
+registryToken: ""
+
 # Helm registry hosting this chart collection. Required when selfSignedCA is true.
 chartRepo:
   url: ""

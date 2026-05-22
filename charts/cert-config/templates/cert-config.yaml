@@ -1,3 +1,4 @@
+{{- if .Values.selfSignedCA }}
 ---
 # Bootstrap issuer — only used to sign the intermediate CA.
 apiVersion: cert-manager.io/v1
@@ -71,3 +72,4 @@ spec:
     namespaceSelector:
       matchLabels:
         kubernetes.io/metadata.name: {{ .Values.runai.namespace | quote }}
+{{- end }}

@@ -1,13 +1,17 @@
 {{- define "runai.certConfig.defaults" -}}
-domain: {{ required "domain is required" .Values.domain | quote }}
-caBundleName: {{ .Values.caBundleName | quote }}
+selfSignedCA: {{ .Values.selfSignedCA }}
+registryToken: {{ .Values.registryToken | quote }}
 certManager:
   namespace: {{ .Values.certManager.namespace | quote }}
 runai:
   namespace: {{ .Values.runai.namespace | quote }}
+{{- if .Values.selfSignedCA }}
+domain: {{ required "domain is required when selfSignedCA is true" .Values.domain | quote }}
+caBundleName: {{ .Values.caBundleName | quote }}
+{{- end }}
 {{- end }}
 
-{{- if .Values.selfSignedCA }}
+{{- if or .Values.selfSignedCA .Values.registryToken }}
 {{- $defaults := fromYaml (include "runai.certConfig.defaults" .) }}
 {{- $values := merge (.Values.certConfig.valuesOverride | default dict) $defaults }}
 apiVersion: argoproj.io/v1alpha1
@@ -22,7 +26,7 @@ metadata:
 spec:
   project: {{ .Values.project }}
   source:
-    repoURL: {{ required "chartRepo.url is required when selfSignedCA is true" .Values.chartRepo.url | quote }}
+    repoURL: {{ required "chartRepo.url is required (baked in by the release pipeline)" .Values.chartRepo.url | quote }}
     chart: cert-config
     targetRevision: {{ .Values.chartRepo.certConfigRevision | quote }}
     helm:

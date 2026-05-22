@@ -1,5 +1,7 @@
 domain: ""
 caBundleName: runai-ca-bundle
+selfSignedCA: false
+registryToken: ""
 
 certManager:
   namespace: cert-manager
