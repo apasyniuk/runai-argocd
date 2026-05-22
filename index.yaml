@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   cert-config:
   - apiVersion: v2
+    created: "2026-05-22T10:39:32.296646565Z"
+    description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
+      TLS — deployed to the workload cluster
+    digest: ca81b690795e617487d7b3dd2b244c915c4c1824c7fccf4ea366a74305ea921e
+    name: cert-config
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-0.6.0/cert-config-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
     created: "2026-05-22T08:08:55.545806666Z"
     description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
       TLS — deployed to the workload cluster
@@ -22,6 +32,16 @@ entries:
     - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-0.4.0/cert-config-0.4.0.tgz
     version: 0.4.0
   runai:
+  - apiVersion: v2
+    created: "2026-05-22T10:39:32.419148858Z"
+    description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
+      Prometheus, and the Run:ai control plane in dependency order
+    digest: 8bbbd3fcf1cc2da865599470a8ea370d39c54b10d08b309d864717f403e2afcf
+    name: runai
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.6.0/runai-0.6.0.tgz
+    version: 0.6.0
   - apiVersion: v2
     created: "2026-05-22T08:08:55.795121946Z"
     description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
@@ -74,4 +94,15 @@ entries:
     urls:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.1.0/runai-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T08:08:55.795150811Z"
+  runai-registration:
+  - apiVersion: v2
+    created: "2026-05-22T10:39:32.562298802Z"
+    description: Registers a workload cluster with the Run:ai Control Plane and writes
+      credentials to a Secret for consumption by the runai-cluster agent chart.
+    digest: cf8632992ca792225688336492430fe668aea76b54d429d2a29799d4d355d867
+    name: runai-registration
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-registration-0.1.0/runai-registration-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-05-22T10:39:32.562351481Z"
