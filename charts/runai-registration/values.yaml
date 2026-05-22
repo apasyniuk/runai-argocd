@@ -6,3 +6,10 @@ clusterURL: ""
 agentVersion: ""
 credentialsNamespace: "argocd"
 image: "alpine/k8s:1.31.4"
+
+# CA certificate for TLS verification.
+# Set caSecretName when using customCAName (Secret with key runai-ca.pem).
+# Set caConfigMapName when using selfSignedCA (trust-manager Bundle ConfigMap).
+caSecretName: ""
+caConfigMapName: ""
+caKey: "runai-ca.pem"

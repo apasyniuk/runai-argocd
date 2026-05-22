@@ -1,3 +1,4 @@
+{{- $hasCA := or .Values.caSecretName .Values.caConfigMapName }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -13,9 +14,26 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}
       restartPolicy: OnFailure
+      {{- if $hasCA }}
+      volumes:
+      - name: ca-cert
+        {{- if .Values.caSecretName }}
+        secret:
+          secretName: {{ .Values.caSecretName }}
+        {{- else }}
+        configMap:
+          name: {{ .Values.caConfigMapName }}
+        {{- end }}
+      {{- end }}
       containers:
       - name: register
         image: {{ .Values.image | quote }}
+        {{- if $hasCA }}
+        volumeMounts:
+        - name: ca-cert
+          mountPath: /etc/ssl/ca
+          readOnly: true
+        {{- end }}
         env:
         - name: CP_URL
           value: {{ .Values.cpURL | quote }}
@@ -31,6 +49,10 @@ spec:
           value: {{ .Values.agentVersion | quote }}
         - name: CREDENTIALS_NAMESPACE
           value: {{ .Values.credentialsNamespace | quote }}
+        {{- if $hasCA }}
+        - name: CURL_CA_BUNDLE
+          value: /etc/ssl/ca/{{ .Values.caKey }}
+        {{- end }}
         command: ["/bin/sh", "-ec"]
         args:
         - |

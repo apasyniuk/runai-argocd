@@ -2,4 +2,4 @@ apiVersion: v2
 name: cert-config
 description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai TLS — deployed to the workload cluster
 type: application
-version: 0.6.0
+version: 1.1.0
