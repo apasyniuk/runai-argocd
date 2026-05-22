@@ -50,5 +50,7 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
+        with:
+          use_full_release_list: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
