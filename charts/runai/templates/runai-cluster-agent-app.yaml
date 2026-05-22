@@ -1,0 +1,43 @@
+{{- if .Values.agentCluster.enabled }}
+{{- $creds := (lookup "v1" "Secret" .Values.argocd.namespace "runai-cluster-credentials") }}
+{{- $data := ($creds.data | default dict) }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}-cluster-agent
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ .Values.project }}
+  source:
+    repoURL: "https://runai.jfrog.io/artifactory/api/helm/run-ai-charts"
+    chart: runai-cluster
+    targetRevision: {{ .Values.runai.version | quote }}
+    helm:
+      releaseName: runai-cluster
+      values: |
+        controlPlane:
+          url: "https://{{ .Values.domain }}"
+          clientSecret: {{ $data.clientSecret | default "" | b64dec | quote }}
+        cluster:
+          uid: {{ $data.clusterUID | default "" | b64dec | quote }}
+          url: "https://{{ .Values.domain }}"
+        global:
+          subdomainSupport: true
+          imagePullSecrets:
+            - name: runai-reg-creds
+        gpu-operator:
+          enabled: false
+  destination:
+    name: in-cluster
+    namespace: runai
+  syncPolicy:
+    automated:
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+{{- end }}

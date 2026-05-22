@@ -28,6 +28,7 @@ registryToken: ""
 chartRepo:
   url: ""
   certConfigRevision: "0.1.0"
+  runaiRegistrationRevision: "0.1.0"
 
 caBundleName: runai-ca-bundle
 
@@ -60,3 +61,12 @@ runai:
   namespace: runai
   version: 2.25.9
   valuesOverride: {}
+
+# agentCluster: when enabled, deploys the runai-cluster agent on the same cluster.
+# Wave 4 registers the cluster with Run:ai API and writes credentials to a Secret.
+# Wave 5 deploys runai-cluster using those credentials via helm lookup.
+# The cluster URL is derived from domain automatically.
+agentCluster:
+  enabled: false
+  # name: cluster name as it will appear in Run:ai. Defaults to destination.name.
+  name: ""

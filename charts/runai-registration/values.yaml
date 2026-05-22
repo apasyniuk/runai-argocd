@@ -1,0 +1,8 @@
+cpURL: ""
+adminUsername: "admin@run.ai"
+adminPassword: ""
+clusterName: ""
+clusterURL: ""
+agentVersion: ""
+credentialsNamespace: "argocd"
+image: "alpine/k8s:1.31.4"
