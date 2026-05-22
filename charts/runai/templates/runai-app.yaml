@@ -45,6 +45,8 @@ spec:
   destination:
     name: {{ .Values.destination.name }}
     namespace: {{ .Values.runai.namespace }}
+# Workaround for ignoring vloumeClaimTemplates differences in the NATS StatefulSet,
+# As for some reason template have a apiVersion field that is not set in the live cluster, causing ArgoCD to always try to update it.
   ignoreDifferences:
   - group: apps
     kind: StatefulSet
