@@ -45,6 +45,12 @@ spec:
   destination:
     name: {{ .Values.destination.name }}
     namespace: {{ .Values.runai.namespace }}
+  ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    name: runai-backend-nats
+    jsonPointers:
+    - /spec/volumeClaimTemplates
   syncPolicy:
     automated:
       prune: false
