@@ -28,7 +28,7 @@ spec:
         caSecretName: {{ .Values.customCAName | quote }}
         caKey: "runai-ca.pem"
         {{- else if .Values.selfSignedCA }}
-        caConfigMapName: {{ .Values.caBundleName | quote }}
+        caSecretName: {{ .Values.caBundleName | quote }}
         caKey: "runai-ca.pem"
         {{- end }}
   destination:

@@ -8,8 +8,7 @@ credentialsNamespace: "argocd"
 image: "alpine/k8s:1.31.4"
 
 # CA certificate for TLS verification.
-# Set caSecretName when using customCAName (Secret with key runai-ca.pem).
-# Set caConfigMapName when using selfSignedCA (trust-manager Bundle ConfigMap).
+# Set caSecretName to mount a Secret containing the CA cert (key configured via caKey).
+# Works for both customCAName and selfSignedCA (trust-manager distributes as a Secret).
 caSecretName: ""
-caConfigMapName: ""
 caKey: "runai-ca.pem"

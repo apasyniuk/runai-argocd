@@ -1,4 +1,4 @@
-{{- $hasCA := or .Values.caSecretName .Values.caConfigMapName }}
+{{- $hasCA := ne .Values.caSecretName "" }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -17,13 +17,8 @@ spec:
       {{- if $hasCA }}
       volumes:
       - name: ca-cert
-        {{- if .Values.caSecretName }}
         secret:
           secretName: {{ .Values.caSecretName }}
-        {{- else }}
-        configMap:
-          name: {{ .Values.caConfigMapName }}
-        {{- end }}
       {{- end }}
       containers:
       - name: register
