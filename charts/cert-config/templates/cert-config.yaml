@@ -69,7 +69,4 @@ spec:
   target:
     secret:
       key: runai-ca.pem
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: {{ .Values.runai.namespace | quote }}
 {{- end }}
