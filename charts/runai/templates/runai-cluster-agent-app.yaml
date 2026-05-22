@@ -1,6 +1,4 @@
 {{- if .Values.agentCluster.enabled }}
-{{- $creds := (lookup "v1" "Secret" .Values.runai.namespace "runai-cluster-credentials") }}
-{{- $data := ($creds.data | default dict) }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -13,35 +11,28 @@ metadata:
 spec:
   project: {{ .Values.project }}
   source:
-    repoURL: "https://runai.jfrog.io/artifactory/api/helm/run-ai-charts"
-    chart: runai-cluster
-    targetRevision: {{ .Values.runai.version | quote }}
+    repoURL: {{ required "chartRepo.url is required (baked in by the release pipeline)" .Values.chartRepo.url | quote }}
+    chart: runai-cluster-agent
+    targetRevision: {{ .Values.chartRepo.runaiClusterAgentRevision | quote }}
     helm:
-      releaseName: runai-cluster
+      releaseName: runai-cluster-agent
       values: |
-        controlPlane:
-          url: "https://{{ .Values.domain }}"
-          existingSecret: runai-cluster-credentials
-          secretKeys:
-            clientSecret: client-secret
-        cluster:
-          uid: {{ $data.clusterUID | default "" | b64dec | quote }}
-          url: "https://{{ .Values.domain }}"
-        global:
-          subdomainSupport: true
-          imagePullSecrets:
-            - name: runai-reg-creds
-          {{- if or .Values.customCAName .Values.selfSignedCA }}
-          customCA:
-            enabled: true
-            secret:
-              name: {{ if .Values.customCAName }}{{ .Values.customCAName | quote }}{{ else }}{{ .Values.caBundleName | quote }}{{ end }}
-          {{- end }}
-        gpu-operator:
-          enabled: false
+        argocd:
+          namespace: {{ .Values.argocd.namespace }}
+        appName: {{ printf "%s-cluster-agent" .Release.Name | quote }}
+        project: {{ .Values.project | quote }}
+        destination:
+          name: {{ .Values.destination.name | quote }}
+        domain: {{ .Values.domain | quote }}
+        runai:
+          namespace: {{ .Values.runai.namespace | quote }}
+          version: {{ .Values.runai.version | quote }}
+        customCAName: {{ .Values.customCAName | quote }}
+        selfSignedCA: {{ .Values.selfSignedCA }}
+        caBundleName: {{ .Values.caBundleName | quote }}
   destination:
     name: {{ .Values.destination.name | quote }}
-    namespace: runai
+    namespace: {{ .Values.argocd.namespace | quote }}
   syncPolicy:
     automated:
       selfHeal: true

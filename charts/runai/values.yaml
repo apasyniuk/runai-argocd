@@ -29,6 +29,7 @@ chartRepo:
   url: ""
   certConfigRevision: "0.1.0"
   runaiRegistrationRevision: "0.1.0"
+  runaiClusterAgentRevision: "0.1.0"
 
 caBundleName: runai-ca-bundle
 

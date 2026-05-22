@@ -1,0 +1,5 @@
+apiVersion: v2
+name: runai-cluster-agent
+description: Reads cluster credentials from a Secret at sync time and renders the runai-cluster ArgoCD Application with the real cluster UID.
+type: application
+version: 1.0.0

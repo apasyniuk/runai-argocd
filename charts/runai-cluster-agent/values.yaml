@@ -1,0 +1,14 @@
+argocd:
+  namespace: argocd
+appName: ""
+project: default
+destination:
+  name: in-cluster
+domain: ""
+runai:
+  namespace: runai
+  version: ""
+customCAName: ""
+selfSignedCA: false
+caBundleName: runai-ca-bundle
+image: "alpine/k8s:1.31.4"
