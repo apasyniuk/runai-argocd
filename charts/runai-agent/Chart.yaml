@@ -1,0 +1,5 @@
+apiVersion: v2
+name: runai-agent
+description: Deploys the runai-cluster ArgoCD Application for a registered workload cluster.
+type: application
+version: 0.1.0

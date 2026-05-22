@@ -29,7 +29,6 @@ chartRepo:
   url: ""
   certConfigRevision: "0.1.0"
   runaiRegistrationRevision: "0.1.0"
-  runaiClusterAgentRevision: "0.1.0"
 
 caBundleName: runai-ca-bundle
 
@@ -63,10 +62,9 @@ runai:
   version: 2.25.9
   valuesOverride: {}
 
-# agentCluster: when enabled, deploys the runai-cluster agent on the same cluster.
-# Wave 4 registers the cluster with Run:ai API and writes credentials to a Secret.
-# Wave 5 deploys runai-cluster using those credentials via helm lookup.
-# The cluster URL is derived from domain automatically.
+# agentCluster: when enabled, registers this cluster with the Run:ai Control Plane
+# and writes credentials to the runai-cluster-credentials Secret in the runai namespace.
+# Deploy the runai-agent ArgoCDApplicationTemplate separately to install the agent.
 agentCluster:
   enabled: false
   # name: cluster name as it will appear in Run:ai. Defaults to destination.name.
