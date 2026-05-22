@@ -33,6 +33,16 @@ entries:
     version: 0.4.0
   runai:
   - apiVersion: v2
+    created: "2026-05-22T11:22:28.178193729Z"
+    description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
+      Prometheus, and the Run:ai control plane in dependency order
+    digest: 0686847f585cb715741ea12595df07a9498cdcab13b3f1e9773c6eb582164a4c
+    name: runai
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.7.0/runai-0.7.0.tgz
+    version: 0.7.0
+  - apiVersion: v2
     created: "2026-05-22T10:39:32.419148858Z"
     description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
       Prometheus, and the Run:ai control plane in dependency order
@@ -105,4 +115,4 @@ entries:
     urls:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-registration-0.1.0/runai-registration-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T10:39:32.562351481Z"
+generated: "2026-05-22T11:22:28.178225905Z"
