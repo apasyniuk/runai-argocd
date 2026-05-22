@@ -1,3 +1,8 @@
+{{- $creds := lookup "v1" "Secret" .Values.runai.namespace .Values.credentialsSecret }}
+{{- if not $creds }}
+  {{- fail (printf "Secret %s/%s not found — run the Run:ai Control Plane template with agentCluster.enabled first" .Values.runai.namespace .Values.credentialsSecret) }}
+{{- end }}
+{{- $uid := index $creds.data "clusterUID" | b64dec }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -20,7 +25,7 @@ spec:
           secretKeys:
             clientSecret: client-secret
         cluster:
-          uid: {{ .Values.clusterUID | quote }}
+          uid: {{ $uid | quote }}
           url: "https://{{ .Values.domain }}"
         global:
           subdomainSupport: true

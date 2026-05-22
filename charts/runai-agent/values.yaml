@@ -4,7 +4,7 @@ project: default
 destination:
   name: in-cluster
 domain: ""
-clusterUID: ""
+credentialsSecret: runai-cluster-credentials
 runai:
   namespace: runai
   version: ""
