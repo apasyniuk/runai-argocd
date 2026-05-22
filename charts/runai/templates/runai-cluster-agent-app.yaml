@@ -31,6 +31,12 @@ spec:
           subdomainSupport: true
           imagePullSecrets:
             - name: runai-reg-creds
+          {{- if or .Values.customCAName .Values.selfSignedCA }}
+          customCA:
+            enabled: true
+            secret:
+              name: {{ if .Values.customCAName }}{{ .Values.customCAName | quote }}{{ else }}{{ .Values.caBundleName | quote }}{{ end }}
+          {{- end }}
         gpu-operator:
           enabled: false
   destination:
