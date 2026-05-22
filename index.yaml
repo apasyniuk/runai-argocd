@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   cert-config:
   - apiVersion: v2
+    created: "2026-05-22T15:03:40.16846427Z"
+    description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
+      TLS — deployed to the workload cluster
+    digest: a558df6d47ae8d8a04cbfc2455c307a43f0a037c2326a0f5d0ea1bbf5acaf84e
+    name: cert-config
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-3.0.0/cert-config-3.0.0.tgz
+    version: 3.0.0
+  - apiVersion: v2
     created: "2026-05-22T14:18:34.809782908Z"
     description: cert-manager intermediate CA chain and trust-manager Bundle for Run:ai
       TLS — deployed to the workload cluster
@@ -112,6 +122,16 @@ entries:
     - https://github.com/apasyniuk/runai-argocd/releases/download/cert-config-0.4.0/cert-config-0.4.0.tgz
     version: 0.4.0
   runai:
+  - apiVersion: v2
+    created: "2026-05-22T15:03:40.367208785Z"
+    description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
+      Prometheus, and the Run:ai control plane in dependency order
+    digest: 0e9fd01d678f9f9dcffe33af9a12a3eb418ccec51e94a5a38d4774ed413f6aa2
+    name: runai
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-3.0.0/runai-3.0.0.tgz
+    version: 3.0.0
   - apiVersion: v2
     created: "2026-05-22T14:18:35.052875902Z"
     description: Run:ai Control Plane — app of apps deploying cert-manager, ingress-nginx,
@@ -264,6 +284,17 @@ entries:
     urls:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-0.1.0/runai-0.1.0.tgz
     version: 0.1.0
+  runai-agent:
+  - apiVersion: v2
+    created: "2026-05-22T15:03:40.510787452Z"
+    description: Deploys the runai-cluster ArgoCD Application for a registered workload
+      cluster.
+    digest: 3babd7df552415674223d0e8cb319533c5b2719181da708f4fd51d973f3846b5
+    name: runai-agent
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-agent-1.0.0/runai-agent-1.0.0.tgz
+    version: 1.0.0
   runai-cluster-agent:
   - apiVersion: v2
     created: "2026-05-22T14:18:35.230927562Z"
@@ -276,6 +307,16 @@ entries:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-cluster-agent-1.0.0/runai-cluster-agent-1.0.0.tgz
     version: 1.0.0
   runai-registration:
+  - apiVersion: v2
+    created: "2026-05-22T15:03:40.692608744Z"
+    description: Registers a workload cluster with the Run:ai Control Plane and writes
+      credentials to a Secret for consumption by the runai-cluster agent chart.
+    digest: e035009e119f3404467be1f7ccab3c2737b2e4ca8114fa125d775ec5e8d521d6
+    name: runai-registration
+    type: application
+    urls:
+    - https://github.com/apasyniuk/runai-argocd/releases/download/runai-registration-3.0.0/runai-registration-3.0.0.tgz
+    version: 3.0.0
   - apiVersion: v2
     created: "2026-05-22T14:18:35.391919925Z"
     description: Registers a workload cluster with the Run:ai Control Plane and writes
@@ -366,4 +407,4 @@ entries:
     urls:
     - https://github.com/apasyniuk/runai-argocd/releases/download/runai-registration-0.1.0/runai-registration-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T14:18:35.392117844Z"
+generated: "2026-05-22T15:03:40.692833291Z"
