@@ -29,7 +29,7 @@ spec:
       values: |
         {{- toYaml $values | nindent 8 }}
   destination:
-    name: {{ .Values.destination.name }}
+    name: {{ .Values.destination.name | quote }}
     namespace: {{ .Values.prometheus.namespace }}
   syncPolicy:
     automated:

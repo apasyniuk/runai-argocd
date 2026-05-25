@@ -1,63 +1,188 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# ArgoCD settings
+# ──────────────────────────────────────────────────────────────────────────────
+
 argocd:
+  # Namespace where ArgoCD is installed. All child Application resources are
+  # created here.
   namespace: argocd
 
+# ArgoCD project that owns all child Applications.
 project: default
 
-# URL of the workload cluster as registered in ArgoCD.
-# Use https://kubernetes.default.svc when ArgoCD and workloads share the same cluster.
+# ──────────────────────────────────────────────────────────────────────────────
+# Destination cluster
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ArgoCD cluster name where Run:ai and its dependencies are deployed.
+# Use "in-cluster" when ArgoCD and the workloads run on the same cluster.
+# For a remote cluster, use the name as registered in ArgoCD
 destination:
   name: in-cluster
 
-# Run:ai credentials and domain
+# ──────────────────────────────────────────────────────────────────────────────
+# Run:ai control-plane
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Fully-qualified domain for the Run:ai UI and APIs (e.g. runai.example.com).
+# Required — TLS certificates and ingress rules are generated from this value.
 domain: ""
+
+# Email address of the initial admin user created during first boot.
 adminUsername: "admin@run.ai"
+
+# Password for the initial admin user. Must satisfy Run:ai password policy.
 adminPassword: ""
+
+# Name of the Kubernetes pull-secret used by the Run:ai pods to pull images
+# from the JFrog registry. The secret must exist in runai.namespace before
+# Run:ai starts. Set registryToken to create it automatically; otherwise
+# create it manually with the name below.
+# Note: if you change this value you must also create the secret with that
+# name — cert-config always names the auto-created secret "runai-reg-creds".
 imagePullSecret: "runai-reg-creds"
 
-# customCAName: existing Secret name with key runai-ca.pem to trust as CA.
-# selfSignedCA: builds a full intermediate CA chain via cert-manager + trust-manager.
-#   Requires chartRepo.url so ArgoCD can pull the cert-config child chart.
-customCAName: ""
-selfSignedCA: false
-
-# registryToken: Run:ai JFrog registry pull token.
-# When set, creates the runai-reg-creds docker-registry Secret automatically.
+# Run:ai JFrog registry pull token. When provided the cert-config chart
+# automatically creates the "runai-reg-creds" docker-registry Secret in
+# runai.namespace. Leave empty if you pre-create the Secret manually.
 registryToken: ""
 
-# Helm registry hosting this chart collection. Required when selfSignedCA is true.
-chartRepo:
-  url: ""
-  certConfigRevision: "0.1.0"
+# ──────────────────────────────────────────────────────────────────────────────
+# TLS / CA configuration
+# ──────────────────────────────────────────────────────────────────────────────
 
+# Name of an existing Secret (in certManager.namespace) that contains a
+# trusted CA certificate to sign Run:ai TLS. The Secret must have:
+#   tls.crt  — CA certificate (PEM)
+#   tls.key  — CA private key (PEM)
+#   runai-ca.pem — same CA cert used by trust-manager for distribution
+# When set, a ClusterIssuer and wildcard Certificate are created, and the CA
+# is distributed cluster-wide via a trust-manager Bundle.
+# Leave empty to skip custom CA configuration.
+customCAName: ""
+
+# When true, cert-manager generates a self-signed intermediate CA and a
+# wildcard TLS certificate for domain. The CA is distributed cluster-wide
+# via trust-manager so that all pods trust the generated certificate.
+# Requires certManager.enabled=true and that chartRepo.url resolves to a
+# registry hosting the cert-config chart (baked in by the release pipeline).
+selfSignedCA: false
+
+# Name of the trust-manager Bundle (and the resulting Secret) that distributes
+# the CA certificate to all namespaces. Consumers reference this Secret by name.
 caBundleName: runai-ca-bundle
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Chart repository (set automatically by the release pipeline)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Helm repository URL hosting the charts in this collection. Required when
+# selfSignedCA=true, customCAName is set, or registryToken is set — ArgoCD
+# fetches the cert-config sub-chart from here.
+# The release pipeline bakes the GitHub Pages URL in automatically; only
+# override this if you host the charts elsewhere.
+chartRepo:
+  url: ""
+  # Version of the cert-config chart to deploy. Set automatically by the
+  # release pipeline to match the cert-config chart version in this release.
+  certConfigRevision: "0.1.0"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# cert-manager  (wave 1)
+# ──────────────────────────────────────────────────────────────────────────────
+
 certManager:
+  # Set to false if cert-manager is already installed in the cluster.
+  # You must still have cert-manager running; this chart does not install it
+  # when disabled.
   enabled: true
+
+  # Namespace where cert-manager is (or will be) installed.
   namespace: cert-manager
+
+  # cert-manager Helm chart version to deploy (from https://charts.jetstack.io).
   version: v1.16.2
+
+  # Arbitrary Helm values merged on top of the chart defaults.
+  # Defaults include: crds.enabled=true
   valuesOverride: {}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# trust-manager  (wave 1)
+# Deployed automatically when selfSignedCA=true or customCAName is set.
+# Requires certManager.enabled=true.
+# ──────────────────────────────────────────────────────────────────────────────
 
 trustManager:
+  # trust-manager Helm chart version to deploy (from https://charts.jetstack.io).
   version: v0.12.0
+
+  # Arbitrary Helm values merged on top of the chart defaults.
+  # Defaults include: secretTargets.enabled=true, secretTargets.authorizedSecretsAll=true
   valuesOverride: {}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ingress-nginx  (wave 2)
+# ──────────────────────────────────────────────────────────────────────────────
 
 ingressNginx:
+  # Set to false if an ingress controller is already installed in the cluster.
   enabled: true
+
+  # Namespace where ingress-nginx is (or will be) installed.
   namespace: ingress-nginx
+
+  # ingress-nginx Helm chart version to deploy
+  # (from https://kubernetes.github.io/ingress-nginx).
   version: 4.11.0
+
+  # Arbitrary Helm values merged on top of the chart defaults.
+  # Defaults include: controller.service.type=LoadBalancer
   valuesOverride: {}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Prometheus / kube-prometheus-stack  (wave 2)
+# ──────────────────────────────────────────────────────────────────────────────
 
 prometheus:
+  # Set to false if Prometheus is already installed in the cluster.
   enabled: true
+
+  # Namespace where the kube-prometheus-stack is (or will be) installed.
   namespace: monitoring
+
+  # kube-prometheus-stack Helm chart version to deploy
+  # (from https://prometheus-community.github.io/helm-charts).
   version: 65.1.1
+
+  # Arbitrary Helm values merged on top of the chart defaults.
+  # Defaults include: alertmanager.enabled=false, grafana.enabled=false,
+  # installCRDs=true
   valuesOverride: {}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# cert-config sub-chart  (wave 2)
+# Deployed only when selfSignedCA, customCAName, or registryToken is set.
+# ──────────────────────────────────────────────────────────────────────────────
 
 certConfig:
+  # Arbitrary Helm values merged on top of the cert-config chart defaults.
   valuesOverride: {}
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Run:ai control-plane chart  (wave 3)
+# Source: https://runai.jfrog.io/artifactory/cp-charts-prod  chart: control-plane
+# ArgoCD must have credentials for the JFrog Helm repository.
+# ──────────────────────────────────────────────────────────────────────────────
 
 runai:
+  # Namespace where the Run:ai control plane is installed.
   namespace: runai
-  version: 2.25.9
-  valuesOverride: {}
 
+  # Version of the Run:ai control-plane Helm chart to deploy.
+  version: 2.25.9
+
+  # Arbitrary Helm values merged on top of the chart defaults.
+  # Defaults include: global.customCA, global.domain, global.imagePullSecrets,
+  # tenantsManager.config.adminUsername/adminPassword
+  valuesOverride: {}

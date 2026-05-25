@@ -1,17 +1,18 @@
 {{- define "runai.certConfig.defaults" -}}
 selfSignedCA: {{ .Values.selfSignedCA }}
+customCAName: {{ .Values.customCAName | quote }}
 registryToken: {{ .Values.registryToken | quote }}
 certManager:
   namespace: {{ .Values.certManager.namespace | quote }}
 runai:
   namespace: {{ .Values.runai.namespace | quote }}
-{{- if .Values.selfSignedCA }}
-domain: {{ required "domain is required when selfSignedCA is true" .Values.domain | quote }}
+{{- if or .Values.selfSignedCA .Values.customCAName }}
+domain: {{ required "domain is required when selfSignedCA or customCAName is set" .Values.domain | quote }}
 caBundleName: {{ .Values.caBundleName | quote }}
 {{- end }}
 {{- end }}
 
-{{- if or .Values.selfSignedCA .Values.registryToken }}
+{{- if or .Values.selfSignedCA .Values.customCAName .Values.registryToken }}
 {{- $defaults := fromYaml (include "runai.certConfig.defaults" .) }}
 {{- $values := merge (.Values.certConfig.valuesOverride | default dict) $defaults }}
 apiVersion: argoproj.io/v1alpha1

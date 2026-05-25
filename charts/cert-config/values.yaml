@@ -1,10 +1,76 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# cert-config chart values
+#
+# This chart sets up TLS certificate infrastructure for Run:ai using
+# cert-manager and trust-manager. Deploy it to the same cluster as the
+# Run:ai control plane. Exactly one of selfSignedCA or customCAName should
+# be set (or neither, in which case the chart only creates the registry
+# pull-secret if registryToken is provided).
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Fully-qualified domain for Run:ai (e.g. runai.example.com).
+# Required when selfSignedCA=true or customCAName is set.
 domain: ""
+
+# Name of the trust-manager Bundle (and resulting Secret) that distributes
+# the CA certificate to all namespaces. All consumers (including the
+# runai-cluster agent) reference this Secret by name.
 caBundleName: runai-ca-bundle
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Self-signed CA (option A)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# When true, cert-manager generates a self-signed intermediate CA and a
+# wildcard TLS certificate for the configured domain. The intermediate CA
+# certificate (public part only) is distributed cluster-wide via a
+# trust-manager Bundle so all pods trust the generated TLS certificate.
+#
+# Resources created:
+#   ClusterIssuer  runai-selfsigned-bootstrap  (bootstrap, ECDSA)
+#   Certificate    runai-intermediate-ca       (isCA=true, 10 yr, in certManager.namespace)
+#   ClusterIssuer  runai-ca-issuer             (backed by the intermediate CA)
+#   Certificate    runai-tls                   (wildcard, 1 yr, in runai.namespace)
+#   Bundle         <caBundleName>              (distributes tls.crt from intermediate CA)
 selfSignedCA: false
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Custom CA (option B)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Name of an existing Secret in certManager.namespace that contains a trusted
+# CA to sign Run:ai TLS. The Secret must have:
+#   tls.crt      — CA certificate in PEM format
+#   tls.key      — CA private key in PEM format
+#   runai-ca.pem — same CA cert, used by the trust-manager Bundle
+#
+# Resources created:
+#   ClusterIssuer  runai-ca-issuer   (backed by this Secret)
+#   Certificate    runai-tls         (wildcard, 1 yr, in runai.namespace)
+#   Bundle         <caBundleName>    (distributes runai-ca.pem from this Secret)
+#
+# Leave empty to skip.
+customCAName: ""
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Registry pull-secret
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Run:ai JFrog registry pull token. When set, creates the "runai-reg-creds"
+# docker-registry Secret in runai.namespace so Run:ai pods can pull images.
+# Leave empty if the Secret already exists in the cluster.
 registryToken: ""
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Namespace references (must match the parent runai chart)
+# ──────────────────────────────────────────────────────────────────────────────
+
 certManager:
+  # Namespace where cert-manager is installed. Intermediate CA Certificate and
+  # ClusterIssuers are created here.
   namespace: cert-manager
 
 runai:
+  # Namespace where the Run:ai control plane is installed. The wildcard TLS
+  # Certificate and the registry pull-secret are created here.
   namespace: runai

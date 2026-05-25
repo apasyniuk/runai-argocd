@@ -1,23 +1,22 @@
-# Standalone reference copy — apply directly to a cluster with ArgoCD already installed:
+# Patches the argocd-cm ConfigMap to install a custom Application health check.
 #
-#   kubectl apply -f argocd-cm-app-health.yaml
+# By default ArgoCD marks a child Application as Healthy as soon as its own health
+# check passes — it does NOT wait for the sync operation (and any Sync hooks) to
+# complete first. This means a wave-N application can be started while wave-(N-1)
+# applications are still running their hooks, violating the intended ordering.
 #
-# When deploying via the runai Helm chart this patch is applied automatically
-# (charts/runai/templates/argocd-cm-patch.yaml) in wave 0 before any child
-# Application resources are created.
+# The Lua script below keeps the health status at "Progressing" whenever an
+# operation is actively Running or Terminating, so ArgoCD genuinely waits for
+# the full sync cycle to finish before advancing to the next wave.
 #
-# Why this matters:
-#   By default ArgoCD marks a child Application Healthy as soon as its own health
-#   check passes, without waiting for the sync operation (and Sync hooks) to
-#   complete. This breaks wave ordering because a wave-N app starts before
-#   wave-(N-1) hooks finish. The Lua script below keeps health at Progressing
-#   while an operation is Running or Terminating, so ArgoCD genuinely waits for
-#   the full sync cycle before advancing to the next wave.
+# Wave 0 — must apply before any child Application resources (waves 1-3) exist.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argocd-cm
-  namespace: argocd
+  namespace: {{ .Values.argocd.namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd

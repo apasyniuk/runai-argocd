@@ -1,4 +1,47 @@
-{{- if .Values.selfSignedCA }}
+{{- if .Values.customCAName }}
+---
+# CA issuer backed by the user-provided CA Secret.
+# The Secret must contain tls.crt (CA certificate) and tls.key (CA private key).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: runai-ca-issuer
+spec:
+  ca:
+    secretName: {{ .Values.customCAName }}
+---
+# Wildcard TLS certificate for Run:ai, signed by the custom CA.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: runai-tls
+  namespace: {{ .Values.runai.namespace }}
+spec:
+  secretName: runai-backend-tls
+  issuerRef:
+    name: runai-ca-issuer
+    kind: ClusterIssuer
+  commonName: {{ required "domain is required when customCAName is set" .Values.domain | quote }}
+  dnsNames:
+    - {{ .Values.domain | quote }}
+    - {{ printf "*.%s" .Values.domain | quote }}
+  duration: 8760h
+  renewBefore: 360h
+---
+# trust-manager Bundle — distributes the custom CA cert to all namespaces.
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: {{ .Values.caBundleName }}
+spec:
+  sources:
+    - secret:
+        name: {{ .Values.customCAName }}
+        key: runai-ca.pem
+  target:
+    secret:
+      key: runai-ca.pem
+{{- else if .Values.selfSignedCA }}
 ---
 # Bootstrap issuer — only used to sign the intermediate CA.
 apiVersion: cert-manager.io/v1

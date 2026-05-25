@@ -9,7 +9,7 @@ app:
     namespace: {{ .Values.certManager.namespace }}
 {{- end }}
 
-{{- if and .Values.selfSignedCA .Values.certManager.enabled }}
+{{- if and (or .Values.selfSignedCA .Values.customCAName) .Values.certManager.enabled }}
 {{- $defaults := fromYaml (include "runai.trustManager.defaults" .) }}
 {{- $values := merge (.Values.trustManager.valuesOverride | default dict) $defaults }}
 apiVersion: argoproj.io/v1alpha1
@@ -32,7 +32,7 @@ spec:
       values: |
         {{- toYaml $values | nindent 8 }}
   destination:
-    name: {{ .Values.destination.name }}
+    name: {{ .Values.destination.name | quote }}
     namespace: {{ .Values.certManager.namespace }}
   syncPolicy:
     automated:
